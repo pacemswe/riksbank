@@ -1,0 +1,26 @@
+name: Update GBP Rate
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 * * *"
+
+jobs:
+  update-rate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Fetch GBP/SEK rate
+        run: |
+          RATE=$(curl -s "https://api.riksbank.se/swea/v1/observations?groups=SEKGBPPMI&datefrom=1900-01-01&todate=today" | jq -r '.groupSeries[0].observations[-1].value')
+          echo "$RATE" > GBP.txt
+
+      - name: Commit updated rate
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add GBP.txt
+          git commit -m "Update GBP rate" || echo "No changes to commit"
+          git push
