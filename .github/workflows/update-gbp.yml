@@ -15,7 +15,7 @@ jobs:
       - name: Fetch GBP/SEK rate from Riksbanken
         run: |
           DATA=$(curl -s "https://api.riksbank.se/swea/v1/observations?groups=SEKGBPPMI&datefrom=1900-01-01&todate=today")
-          RATE=$(echo "$DATA" | jq -r '.. | objects | select(has("value")) | .value' | tail -n 1)
+          RATE=$(echo "$DATA" | jq -r '.observations | last | .value')
           echo "$RATE" > GBP.txt
 
       - name: Commit updated rate
