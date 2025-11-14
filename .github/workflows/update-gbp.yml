@@ -12,9 +12,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Fetch GBP/SEK rate
+      - name: Fetch GBP/SEK rate from Riksbanken
         run: |
-          RATE=$(curl -s "https://api.riksbank.se/swea/v1/observations?groups=SEKGBPPMI&datefrom=1900-01-01&todate=today" | jq -r '.groupSeries[0].observations[-1].value')
+          DATA=$(curl -s "https://api.riksbank.se/swea/v1/observations?groups=SEKGBPPMI&datefrom=1900-01-01&todate=today")
+          RATE=$(echo "$DATA" | jq -r '.. | objects | select(has("value")) | .value' | tail -n 1)
           echo "$RATE" > GBP.txt
 
       - name: Commit updated rate
