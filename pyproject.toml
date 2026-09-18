@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "swedish-radar"
+version = "1.0.0"
+description = "Find new Spotify releases by Swedish artists, on Swedish independent labels, or written primarily by Swedish songwriters."
+readme = "swedish_radar/README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["spotify", "musicbrainz", "music-discovery", "sweden", "new-releases"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Multimedia :: Sound/Audio",
+  "Environment :: Console",
+  "Environment :: Web Environment",
+]
+# No runtime dependencies: everything is standard library.
+dependencies = []
+
+[project.scripts]
+swedish-radar = "swedish_radar.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["swedish_radar*"]
+
+[tool.setuptools.package-data]
+swedish_radar = ["data/*.json", "web/*"]

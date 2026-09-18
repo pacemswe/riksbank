@@ -1,0 +1,82 @@
+name: Swedish Radar digest
+
+# Runs a discovery pass and commits the result as a Markdown + JSON digest.
+# Requires the SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET repository secrets;
+# without them the job reports that and exits successfully.
+
+on:
+  workflow_dispatch:
+    inputs:
+      criteria:
+        description: "Criteria (comma-separated: artist,label,writer)"
+        default: "artist,label,writer"
+      days:
+        description: "Release window in days"
+        default: "7"
+  schedule:
+    - cron: "0 6 * * 1"   # Mondays, 06:00 UTC
+
+permissions:
+  contents: write
+
+concurrency:
+  group: swedish-radar-digest
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check for credentials
+        id: creds
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+        run: |
+          if [ -n "$SPOTIFY_CLIENT_ID" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::SPOTIFY_CLIENT_ID is not set - skipping the discovery run."
+          fi
+
+      - name: Restore the response cache
+        if: steps.creds.outputs.present == 'true'
+        uses: actions/cache@v4
+        with:
+          # MusicBrainz allows ~1 request/second, so carrying the cache between
+          # runs is what keeps this job to a few minutes instead of an hour.
+          path: .radar-cache
+          key: swedish-radar-cache-${{ github.run_id }}
+          restore-keys: swedish-radar-cache-
+
+      - name: Run discovery
+        if: steps.creds.outputs.present == 'true'
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          MUSICBRAINZ_CONTACT: ${{ github.repository }} (github actions)
+          RADAR_CACHE_PATH: .radar-cache/cache.sqlite3
+          RADAR_DAYS: ${{ github.event.inputs.days || '7' }}
+        run: |
+          mkdir -p radar
+          # One pass over the APIs, then re-render the saved JSON locally.
+          python -m swedish_radar discover \
+            --criteria "${{ github.event.inputs.criteria || 'artist,label,writer' }}" \
+            --format json --out radar/latest.json
+          python -m swedish_radar render --input radar/latest.json \
+            --format markdown --out radar/latest.md
+
+      - name: Commit the digest
+        if: steps.creds.outputs.present == 'true'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add radar/latest.md radar/latest.json
+          git commit -m "Update Swedish Radar digest" || echo "No changes to commit"
+          git push
