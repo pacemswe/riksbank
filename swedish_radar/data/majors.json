@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "note": "Label-string markers that disqualify a release from 'independent'. `groups` are the three majors and their imprints/distribution arms. `aggregators` are DIY distribution services: seeing one means the label field carries no label information at all.",
+  "groups": {
+    "Universal Music Group": [
+      "universal music", "universal music ab", "universal music sweden", "umg recordings",
+      "ume", "polydor", "interscope", "capitol records", "def jam", "island records",
+      "republic records", "geffen", "emi records", "emi music", "virgin records",
+      "virgin music", "decca", "verve records", "motown", "mercury records",
+      "sonet", "stockholm records", "ingrooves", "spinnup", "abbey road", "blue note",
+      "deutsche grammophon", "sonet grammofon"
+    ],
+    "Sony Music Entertainment": [
+      "sony music", "sony bmg", "columbia records", "rca records", "epic records",
+      "arista", "legacy recordings", "century media", "ultra records",
+      "ministry of sound", "the orchard", "awal", "awal recordings", "masterworks",
+      "robotberget", "bmg columbia", "j records", "so recordings"
+    ],
+    "Warner Music Group": [
+      "warner music", "warner records", "warner bros records", "atlantic records",
+      "elektra", "parlophone", "rhino records", "300 entertainment", "asylum records",
+      "nonesuch", "wea", "ada worldwide", "alternative distribution alliance",
+      "warner classics", "erato"
+    ]
+  },
+  "aggregators": [
+    "distrokid", "cd baby", "cdbaby", "tunecore", "unitedmasters", "ditto music",
+    "symphonic distribution", "believe", "believe digital", "routenote",
+    "amuse", "amuse io", "record union", "soundrop", "landr", "onerpm", "one rpm",
+    "too lost", "horus music", "label engine", "repost network", "stem",
+    "independent artist", "independently released", "self released", "self-released"
+  ],
+  "major_distribution_phrases": [
+    "under exclusive license to",
+    "under exclusive licence to",
+    "distributed by",
+    "a division of",
+    "an imprint of",
+    "marketed by"
+  ]
+}

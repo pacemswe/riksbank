@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swedish Radar</title>
+<link rel="stylesheet" href="/static/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🇸🇪</text></svg>">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <div>
+      <h1>Swedish Radar</h1>
+      <p class="tagline">New Spotify releases with a Swedish connection</p>
+    </div>
+  </div>
+  <div class="topbar-status" id="config-status" role="status"></div>
+</header>
+
+<main>
+  <section class="panel controls" aria-labelledby="controls-heading">
+    <h2 id="controls-heading">Search criteria</h2>
+    <p class="hint">Pick one or more. A release matches if it satisfies <em>any</em> selected criterion.</p>
+
+    <fieldset class="criteria">
+      <legend class="sr-only">Criteria</legend>
+      <label class="criterion">
+        <input type="checkbox" id="crit-artist" value="artist" checked>
+        <span class="criterion-body">
+          <span class="criterion-title">By Swedish artists</span>
+          <span class="criterion-note">Artist nationality from MusicBrainz, backed by Spotify genre tags and ISRC registration.</span>
+        </span>
+      </label>
+      <label class="criterion">
+        <input type="checkbox" id="crit-label" value="label" checked>
+        <span class="criterion-body">
+          <span class="criterion-title">By Swedish independent labels</span>
+          <span class="criterion-note">Curated label list plus MusicBrainz label country. Majors are excluded.</span>
+        </span>
+      </label>
+      <label class="criterion">
+        <input type="checkbox" id="crit-writer" value="writer" checked>
+        <span class="criterion-body">
+          <span class="criterion-title">Written primarily by Swedish songwriters</span>
+          <span class="criterion-note">ISRC → MusicBrainz work → composer/lyricist credits. Partial coverage; never guessed.</span>
+        </span>
+      </label>
+    </fieldset>
+
+    <div class="tuning">
+      <label>Released within
+        <select id="days">
+          <option value="7">7 days</option>
+          <option value="14" selected>14 days</option>
+          <option value="30">30 days</option>
+          <option value="60">60 days</option>
+        </select>
+      </label>
+      <label>Markets
+        <input type="text" id="markets" value="SE" size="8" spellcheck="false" aria-describedby="markets-hint">
+      </label>
+      <label>Min. confidence
+        <input type="range" id="confidence" min="0.3" max="0.9" step="0.05" value="0.55">
+        <output id="confidence-out">0.55</output>
+      </label>
+      <label>Max releases
+        <input type="number" id="max-albums" value="400" min="20" max="2000" step="20">
+      </label>
+    </div>
+    <p class="hint" id="markets-hint">Comma-separated ISO country codes, e.g. <code>SE</code> or <code>SE,NO</code>.</p>
+
+    <div class="actions">
+      <button id="run" class="primary">Run discovery</button>
+      <select id="history" aria-label="Previous runs"></select>
+      <button id="export" class="ghost">Export JSON</button>
+    </div>
+    <div id="job" class="job" hidden>
+      <div class="job-head"><span class="spinner" aria-hidden="true"></span><strong id="job-status">Starting…</strong></div>
+      <pre id="job-log" class="job-log" aria-live="polite"></pre>
+    </div>
+  </section>
+
+  <section class="panel results" aria-labelledby="results-heading">
+    <div class="results-head">
+      <h2 id="results-heading">Releases</h2>
+      <div class="results-tools">
+        <input type="search" id="filter" placeholder="Filter by artist, title or label" aria-label="Filter results">
+        <select id="sort" aria-label="Sort results">
+          <option value="score">Best match</option>
+          <option value="date">Newest first</option>
+          <option value="artist">Artist A–Z</option>
+        </select>
+      </div>
+    </div>
+    <div id="chips" class="chips"></div>
+    <div id="summary" class="summary"></div>
+    <div id="results" class="cards"></div>
+    <div id="empty" class="empty" hidden></div>
+  </section>
+</main>
+
+<footer>
+  <p>
+    Data from the <a href="https://developer.spotify.com/documentation/web-api" rel="noreferrer">Spotify Web API</a>
+    and <a href="https://musicbrainz.org" rel="noreferrer">MusicBrainz</a>.
+    Every match shows the evidence it was built from — expand a card to audit it.
+  </p>
+</footer>
+
+<template id="card-template">
+  <article class="card">
+    <div class="cover"><img alt="" loading="lazy"></div>
+    <div class="card-body">
+      <div class="card-head">
+        <h3 class="card-artist"></h3>
+        <p class="card-title"></p>
+      </div>
+      <p class="card-meta"></p>
+      <p class="card-label"></p>
+      <div class="badges"></div>
+      <ul class="reasons"></ul>
+      <div class="card-actions">
+        <a class="listen" target="_blank" rel="noreferrer">Open in Spotify</a>
+        <button class="evidence-toggle ghost" type="button" aria-expanded="false">Show evidence</button>
+      </div>
+      <div class="evidence" hidden></div>
+    </div>
+  </article>
+</template>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
